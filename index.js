@@ -1,7 +1,6 @@
 const express = require('express');
 const app = express();
 const bodyParser = require('body-parser');
-const mongo = require('./database/mongoAdapter');
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({
@@ -28,12 +27,12 @@ app.use(function (req, res, next) {
     next();
 });
 
-mongo.connectWithRetry().then(function () {
-    const blogs = require('./controllers/postController')(app);
+const blogs = require('./controllers/postController')(app);
 
-    const server = app.listen(process.env.PORT || 8080, function () {
-        let port = server.address().port;
-        console.log("Listening on " + port);
-    });
+const server = app.listen(process.env.PORT || 8080, function () {
+    let port = server.address().port;
+    console.log("Listening on " + port);
 });
+
+
 
