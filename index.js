@@ -11,7 +11,7 @@ app.use(bodyParser.urlencoded({
 mongo.connectWithRetry().then(function () {
     const blogs = require('./controllers/postController')(app);
 
-    const server = app.listen(3000, function () {
+    const server = app.listen(process.env.PORT || 8080, function () {
         console.log("Listening on 3000");
     });
 });
