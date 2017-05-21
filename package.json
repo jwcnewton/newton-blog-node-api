@@ -12,6 +12,7 @@
     "async": "^2.4.0",
     "body-parser": "^1.17.2",
     "express": "^4.15.3",
-    "mongoose": "^4.10.0"
+    "mongoose": "^4.10.0",
+    "opbeat": "^4.13.3"
   }
 }

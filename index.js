@@ -1,7 +1,9 @@
 const express = require('express');
 const app = express();
 const bodyParser = require('body-parser');
+const opbeat = require('opbeat').start();
 
+app.use(opbeat.middleware.express())
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({
     extended: true
