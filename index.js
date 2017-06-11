@@ -33,7 +33,7 @@ app.use(function (req, res, next) {
 
 const blogs = require('./controllers/postController')(app);
 
-const server = app.listen(process.env.PORT || 8000, function () {
+const server = app.listen(process.env.PORT || 8080, function () {
     let port = server.address().port;
     console.log("Listening on " + port);
 });

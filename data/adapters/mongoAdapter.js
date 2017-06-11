@@ -11,7 +11,23 @@ const options = {
 
 mongoose.Promise = Promise;
 
-mongoose.connect(mongoConn, options);
+const connect = function () {
+    mongoose.connect(mongoConn, options);
+};
+
+connect();
+
+mongoose.connection.on('error', err => {
+    let stack;
+    if (err) {
+        stack = err.stack;
+    }
+    opbeat.captureError(err);
+});
+
+mongoose.connection.on('disconnected', () => {
+    setTimeout(connect, 3000);
+});
 
 // If the connection throws an error
 mongoose.connection.on('error', function (err) {

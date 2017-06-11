@@ -1,4 +1,4 @@
-var mongoDB = require('../database/mongoAdapter');
+var mongoDB = require('../data/adapters/mongoAdapter');
 
 var postSchema = mongoDB.Schema({
     id: String,
