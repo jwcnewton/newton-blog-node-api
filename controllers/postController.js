@@ -1,80 +1,47 @@
 const Posts = require('../models/postModel');
 const async = require('async');
-var mongoose = require('mongoose');
-const mongoConn = 'mongodb://newtonblog:' + process.env.DB_BLOG_PASSWORD +
-    '@newtonblog.documents.azure.com:10255/admin/?ssl=true&replicaSet=globaldb'
+const opbeat = require('opbeat');
+const postRepo = require('../database/postsRepository');
+
 module.exports = function (app) {
 
     app.get('/posts', function (req, res) {
         async.parallel({
             data: function (callback) {
-
-                mongoose.connect(mongoConn);
-                var db = mongoose.connection;
-                db.on('error', function () {
-                    db.close();
-                    return callback({ Error: "Mongo Error" });
+                postRepo.getAllPosts().then(function (posts) {
+                    callback(null, posts)
+                }, function (err) {
+                    callback({ error: err, source: "/posts" }, null);
                 });
-                db.once('open', function () {
-                    Posts.find({}, 'id title description',
-                        function (err, allPosts) {
-                            if (err) {
-                                db.close();
-                                return callback({ Error: err });
-                            }
-                            db.close();
-                            return callback(err, allPosts);
-                        });
-                });
-
             }
-        },
-            function (err, response) {
-                return res.json({ error: err, data: response.data })
-            });
+        }, function (err, response) {
+            if (err) {
+                logException(err);
+            }
+            return res.json({ error: err, data: response.data });
+        });
     });
 
     app.get('/post/:id', function (req, res) {
         async.parallel({
             data: function (callback) {
-
-                mongoose.connect(mongoConn);
-                var db = mongoose.connection;
-                db.on('error', function () {
-                    db.close();
-                    return callback({ Error: "Mongo Error" });
+                let postId = req.params.id;
+                postRepo.getPostById(postId).then(function (post) {
+                    callback(null, post)
+                }, function (err) {
+                    callback({ error: err, source: "/post" }, null);
                 });
-                db.once('open', function () {
-                    let query = Posts.find({}).where('id', req.params.id);
-                    query.exec(function (err, post) {
-                        if (err) {
-                            db.close();
-                            callback("error");
-                        }
-                        if (!post.length) {
-                            db.close();
-                            callback("error");
-                        }
-                        if (post) {
-                            db.close();
-                            callback(err, post);
-                        }
-                    });
-
-                });
-
             }
         }, function (err, response) {
             if (err) {
-                res.status(404) // HTTP status 404: NotFound
-                    .send('Not found');
-            }
-            res.json({
-                error: err,
-                data: response.data
-            })
+                logException(err);
+            } 
+            res.json({ error: err, data: response.data });
         });
     });
+}
 
+logException = (err) => {
+    opbeat.captureError(err);
 }
 

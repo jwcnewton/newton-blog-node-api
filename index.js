@@ -3,11 +3,13 @@ const app = express();
 const bodyParser = require('body-parser');
 const opbeat = require('opbeat').start();
 
-app.use(opbeat.middleware.express())
 app.use(bodyParser.json());
+
 app.use(bodyParser.urlencoded({
     extended: true
 }));
+
+app.use(opbeat.middleware.express())
 
 // Add headers
 app.use(function (req, res, next) {
@@ -31,7 +33,7 @@ app.use(function (req, res, next) {
 
 const blogs = require('./controllers/postController')(app);
 
-const server = app.listen(process.env.PORT || 8080, function () {
+const server = app.listen(process.env.PORT || 8000, function () {
     let port = server.address().port;
     console.log("Listening on " + port);
 });

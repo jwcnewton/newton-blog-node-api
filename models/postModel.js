@@ -1,11 +1,15 @@
-var mongoose = require('mongoose');
+var mongoDB = require('../database/mongoAdapter');
 
-var postSchema = mongoose.Schema({
+var postSchema = mongoDB.Schema({
     id: String,
     title: String,
     description: String,
     postContext: String,
     postDate: Date,
+    embededLinks: [{
+        id: String,
+        link: String
+    }]
 });
 
-module.exports = mongoose.model('posts', postSchema);
+module.exports = mongoDB.model('posts', postSchema);
