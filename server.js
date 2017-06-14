@@ -1,7 +1,8 @@
+const opbeat = require('opbeat').start();
 const express = require('express');
 const app = express();
 const bodyParser = require('body-parser');
-const opbeat = require('opbeat').start();
+
 
 app.use(bodyParser.json());
 
@@ -29,6 +30,28 @@ app.use(function (req, res, next) {
 
     // Pass to next layer of middleware
     next();
+});
+
+// JSON parser middleware
+app.use(function (req, res, next) {
+  if (req.headers['content-type'] !== 'application/json') {
+    return next()
+  }
+
+  var trace = opbeat.buildTrace()
+
+  // start the trace to measure the time it takes to parse
+  // the JSON
+  if (trace) trace.start('parse json')
+
+  try {
+    req.json = JSON.parse(req.body)
+  } catch (e) {}
+
+  // when we've processed the json, stop the custom trace
+  if (trace) trace.end()
+
+  next()
 });
 
 const blogs = require('./controllers/postController')(app);
